@@ -63,6 +63,7 @@
             this.btn_salir_reserva.TabIndex = 48;
             this.btn_salir_reserva.Text = "Salir";
             this.btn_salir_reserva.UseVisualStyleBackColor = true;
+            this.btn_salir_reserva.Click += new System.EventHandler(this.btn_salir_reserva_Click);
             // 
             // btn_cancelar_reserva
             // 
@@ -72,6 +73,7 @@
             this.btn_cancelar_reserva.TabIndex = 47;
             this.btn_cancelar_reserva.Text = "Cancelar";
             this.btn_cancelar_reserva.UseVisualStyleBackColor = true;
+            this.btn_cancelar_reserva.Click += new System.EventHandler(this.btn_cancelar_reserva_Click);
             // 
             // btn_eliminar_reserva
             // 
@@ -81,6 +83,7 @@
             this.btn_eliminar_reserva.TabIndex = 46;
             this.btn_eliminar_reserva.Text = "Eliminar";
             this.btn_eliminar_reserva.UseVisualStyleBackColor = true;
+            this.btn_eliminar_reserva.Click += new System.EventHandler(this.btn_eliminar_reserva_Click);
             // 
             // btn_editar_reserva
             // 
@@ -90,6 +93,7 @@
             this.btn_editar_reserva.TabIndex = 45;
             this.btn_editar_reserva.Text = "Editar";
             this.btn_editar_reserva.UseVisualStyleBackColor = true;
+            this.btn_editar_reserva.Click += new System.EventHandler(this.btn_editar_reserva_Click);
             // 
             // btn_guardar_reserva
             // 
@@ -99,6 +103,7 @@
             this.btn_guardar_reserva.TabIndex = 44;
             this.btn_guardar_reserva.Text = "Guardar";
             this.btn_guardar_reserva.UseVisualStyleBackColor = true;
+            this.btn_guardar_reserva.Click += new System.EventHandler(this.btn_guardar_reserva_Click);
             // 
             // txt_descripcion_reserva
             // 
@@ -158,6 +163,7 @@
             this.lst_reservas.Name = "lst_reservas";
             this.lst_reservas.Size = new System.Drawing.Size(279, 276);
             this.lst_reservas.TabIndex = 36;
+            this.lst_reservas.DoubleClick += new System.EventHandler(this.lst_reservas_DoubleClick);
             // 
             // label2
             // 
@@ -229,6 +235,7 @@
             this.Controls.Add(this.label1);
             this.Name = "frm_reservaciones";
             this.Text = "frm_reservaciones";
+            this.Load += new System.EventHandler(this.frm_reservaciones_Load);
             this.ResumeLayout(false);
             this.PerformLayout();
 

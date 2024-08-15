@@ -26,5 +26,12 @@
         {
             return modeloCliente.DeleteCliente(cliente);
         }
+
+        //Metodo para obtener clientes para el combo box
+        public List<ClienteModel> ObtenerClientes()
+        {
+            return modeloCliente.ObtenerClientes();
+        }
+
     }
 }

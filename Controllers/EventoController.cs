@@ -26,5 +26,9 @@
         {
             return modeloEvento.DeleteEvento(evento);
         }
+        public List<EventoModel> ObtenerEventos()
+        {
+            return modeloEvento.ObtenerEventos();
+        }
     }
 }

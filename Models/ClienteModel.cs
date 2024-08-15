@@ -15,12 +15,23 @@
         public string email { get; set; }
         public string telefono { get; set; }
 
-
-        List<ClienteModel> listaClientes = new List<ClienteModel>();
+        
         private ConexionBDD conexion = new ConexionBDD();
         SqlCommand cmd = new SqlCommand();
+
+        public class ClienteComboBoxItem
+        {
+            public int Id { get; set; }
+            public string DisplayText { get; set; }
+
+            public override string ToString()
+            {
+                return DisplayText;
+            }
+        }
         public List<ClienteModel> Clientes()
-        { 
+        {
+            List<ClienteModel> listaClientes = new List<ClienteModel>();
             string cadena = "select * from clientes";
             SqlDataAdapter adapter = new SqlDataAdapter(cadena, conexion.AbrirConexion());
             DataTable tabla = new DataTable();
@@ -93,7 +104,7 @@
                 cmd.Parameters.Clear();
                 cmd.Parameters.AddWithValue("@nombre", cliente.nombre);
                 cmd.Parameters.AddWithValue("@apellido", cliente.apellido);
-                cmd.Parameters.AddWithValue("@correo", cliente.email);
+                cmd.Parameters.AddWithValue("@email", cliente.email);
                 cmd.Parameters.AddWithValue("@telefono", cliente.telefono);
                 cmd.Parameters.AddWithValue("@cliente_id", cliente.cliente_id);
                 cmd.ExecuteNonQuery();
@@ -128,6 +139,41 @@
             {
                 conexion.CerrarConexcion();
             }
+        }
+
+        ///Metodo para obtener clientes para el combo box
+        public List<ClienteModel> ObtenerClientes()
+        {
+            List<ClienteModel> clientesBox = new List<ClienteModel>();
+            try
+            {
+                string query = "SELECT cliente_id, nombre, apellido FROM clientes";
+                SqlCommand cmd = new SqlCommand(query, conexion.AbrirConexion());
+                SqlDataReader reader = cmd.ExecuteReader();
+
+                while (reader.Read())
+                {
+                    ClienteModel cliente = new ClienteModel
+                    {
+                        cliente_id = Convert.ToInt32(reader["cliente_id"]),
+                        nombre = reader["nombre"].ToString(),
+                        apellido = reader["apellido"].ToString(),
+                    };
+                    clientesBox.Add(cliente);
+                }
+
+                reader.Close();
+            }
+            catch (Exception ex)
+            {
+                MessageBox.Show("Error al obtener los clientes: " + ex.Message);
+            }
+            finally
+            {
+                conexion.CerrarConexcion();
+            }
+
+            return clientesBox;
         }
     }
 }

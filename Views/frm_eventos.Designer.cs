@@ -162,6 +162,7 @@
             this.lst_eventos.Size = new System.Drawing.Size(279, 276);
             this.lst_eventos.TabIndex = 19;
             this.lst_eventos.SelectedIndexChanged += new System.EventHandler(this.lst_eventos_SelectedIndexChanged);
+            this.lst_eventos.DoubleClick += new System.EventHandler(this.lst_eventos_DoubleClick);
             // 
             // label2
             // 

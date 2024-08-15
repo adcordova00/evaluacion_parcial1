@@ -1,13 +1,7 @@
-﻿using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
-using System.Data.SqlClient;
-using System.Data;
-
-namespace evaluacion_parcial1.Config
+﻿namespace evaluacion_parcial1.Config
 {
+    using System.Data.SqlClient;
+    using System.Data;
     class ConexionBDD
     {
         private SqlConnection connection = new SqlConnection("Server=DESKTOP-KA0EPGU\\SQLEXPRESS;database=Eventos;uid=sa;pwd=1234");

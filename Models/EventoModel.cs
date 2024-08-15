@@ -5,23 +5,22 @@
     using System.Data.SqlClient;
     using System.Data;
     using evaluacion_parcial1.Config;
+    using System.Windows.Forms;
 
     class EventoModel
     {
         public int evento_id { get; set; }
         public string nombre { get; set; }
         public string descripcion { get; set; }
-        public DateTime fecha { get; set; }
         public string ubicacion { get; set; }
-        public int cliente_id { get; set; }
+        public DateTime fecha { get; set; }
 
-
-        List<EventoModel> listaEventos = new List<EventoModel>();
         private ConexionBDD conexion = new ConexionBDD();
         SqlCommand cmd = new SqlCommand();
 
         public List<EventoModel> Eventos()
         {
+            List<EventoModel> listaEventos = new List<EventoModel>();
             string cadena = "select *  from eventos";
             SqlDataAdapter adapter = new SqlDataAdapter(cadena, conexion.AbrirConexion());
             DataTable tabla = new DataTable();
@@ -33,9 +32,8 @@
                     evento_id = Convert.ToInt32(evento["evento_id"]),
                     nombre = evento["nombre"].ToString(),
                     descripcion = evento["descripcion"].ToString(),
-                    fecha = Convert.ToDateTime(evento["fecha"]),
                     ubicacion = evento["ubicacion"].ToString(),
-                    cliente_id = Convert.ToInt32(evento["cliente_id"]),
+                    fecha = Convert.ToDateTime(evento["fecha"]),
                 };
                 listaEventos.Add(nuevoevento);
             }
@@ -55,9 +53,8 @@
                 evento_id = Convert.ToInt32(lector["evento_id"]),
                 nombre = lector["nombre"].ToString(),
                 descripcion = lector["descripcion"].ToString(),
-                fecha = Convert.ToDateTime(lector["fecha"]),
                 ubicacion = lector["ubicacion"].ToString(),
-                cliente_id = Convert.ToInt32(lector["cliente_id"]),
+                fecha = Convert.ToDateTime(lector["fecha"]),
             };
             conexion.CerrarConexcion();
             return returned_evento;
@@ -67,13 +64,13 @@
             try
             {
                 cmd.Connection = conexion.AbrirConexion();
-                cmd.CommandText = "INSERT INTO eventos (nombre, descripcion, fecha, ubicacion) VALUES (@nombre, @descripcion, @fecha, @ubicacion)";
+                cmd.CommandText = "INSERT INTO eventos (nombre, descripcion, ubicacion, fecha) VALUES (@nombre, @descripcion, @ubicacion, @fecha)";
 
                 cmd.Parameters.Clear();
                 cmd.Parameters.AddWithValue("@nombre", evento.nombre);
                 cmd.Parameters.AddWithValue("@descripcion", evento.descripcion);
-                cmd.Parameters.AddWithValue("@fecha", evento.fecha);
                 cmd.Parameters.AddWithValue("@ubicacion", evento.ubicacion);
+                cmd.Parameters.AddWithValue("@fecha", evento.fecha);
                 cmd.ExecuteNonQuery();
                 return "ok";
             }
@@ -91,11 +88,14 @@
             try
             {
                 cmd.Connection = conexion.AbrirConexion();
-                cmd.CommandText = "update eventos set nombre='" + evento.nombre + "' where evento_id=" + evento.evento_id;
-                cmd.CommandText = "update eventos set descripcion='" + evento.descripcion + "' where evento_id=" + evento.evento_id;
-                cmd.CommandText = "update eventos set fecha='" + evento.fecha + "' where evento_id=" + evento.evento_id;
-                cmd.CommandText = "update eventos set ubicacion='" + evento.ubicacion + "' where evento_id=" + evento.evento_id;
-                cmd.CommandText = "update eventos set cliente_id='" + evento.cliente_id + "' where evento_id=" + evento.evento_id;
+                cmd.CommandText = "UPDATE eventos SET nombre = @nombre, descripcion = @descripcion, ubicacion = @ubicacion, fecha = @fecha WHERE evento_id = @evento_id";
+
+                cmd.Parameters.Clear();
+                cmd.Parameters.AddWithValue("@nombre", evento.nombre);
+                cmd.Parameters.AddWithValue("@descripcion", evento.descripcion);
+                cmd.Parameters.AddWithValue("@ubicacion", evento.ubicacion);
+                cmd.Parameters.AddWithValue("@fecha", evento.fecha);
+                cmd.Parameters.AddWithValue("@evento_id", evento.evento_id);
                 cmd.ExecuteNonQuery();
                 return "ok";
             }
@@ -125,6 +125,40 @@
             {
                 conexion.CerrarConexcion();
             }
+        }
+
+        public List<EventoModel> ObtenerEventos()
+        {
+            List<EventoModel> eventosBox = new List<EventoModel>();
+
+            try
+            {
+                string query = "SELECT evento_id, nombre FROM eventos";
+                SqlCommand cmd = new SqlCommand(query, conexion.AbrirConexion());
+                SqlDataReader reader = cmd.ExecuteReader();
+
+                while (reader.Read())
+                {
+                    EventoModel evento = new EventoModel
+                    {
+                        evento_id = Convert.ToInt32(reader["evento_id"]),
+                        nombre = reader["nombre"].ToString()
+                    };
+                    eventosBox.Add(evento);
+                }
+
+                reader.Close();
+            }
+            catch (Exception ex)
+            {
+                MessageBox.Show("Error al obtener los eventos: " + ex.Message);
+            }
+            finally
+            {
+                conexion.CerrarConexcion();
+            }
+
+            return eventosBox;
         }
 
     }

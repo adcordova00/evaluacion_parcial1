@@ -75,6 +75,7 @@
             this.lst_clientes.Size = new System.Drawing.Size(279, 276);
             this.lst_clientes.TabIndex = 2;
             this.lst_clientes.SelectedIndexChanged += new System.EventHandler(this.lst_clientes_SelectedIndexChanged);
+            this.lst_clientes.DoubleClick += new System.EventHandler(this.lst_clientes_DoubleClick);
             // 
             // label3
             // 
@@ -158,6 +159,7 @@
             this.btn_editar_cliente.TabIndex = 13;
             this.btn_editar_cliente.Text = "Editar";
             this.btn_editar_cliente.UseVisualStyleBackColor = true;
+            this.btn_editar_cliente.Click += new System.EventHandler(this.btn_editar_cliente_Click);
             // 
             // btn_eliminar_cliente
             // 

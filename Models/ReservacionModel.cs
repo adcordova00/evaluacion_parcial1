@@ -15,13 +15,12 @@
         public string descripcion { get; set; }
         
 
-
-        List<ReservacionModel> listaReservaciones = new List<ReservacionModel>();
         private ConexionBDD conexion = new ConexionBDD();
         SqlCommand cmd = new SqlCommand();
 
         public List<ReservacionModel> Reservas()
         {
+            List<ReservacionModel> listaReservaciones = new List<ReservacionModel>();
             string cadena = "select *  from reservaciones";
             SqlDataAdapter adapter = new SqlDataAdapter(cadena, conexion.AbrirConexion());
             DataTable tabla = new DataTable();
@@ -68,9 +67,14 @@
             try
             {
                 cmd.Connection = conexion.AbrirConexion();
-                cmd.CommandText = "insert into reservaciones(nombre) values('" + reserva.nombre + "')";
-                cmd.CommandText = "insert into reservaciones(fecha) values('" + reserva.fecha + "')";
-                cmd.CommandText = "insert into reservaciones(descripcion) values('" + reserva.descripcion + "')";
+                cmd.CommandText = "INSERT INTO reservaciones (nombre, cliente_id, evento_id, fecha, descripcion) VALUES (@nombre, @cliente_id, @evento_id, @fecha, @descripcion)";
+
+                cmd.Parameters.Clear();
+                cmd.Parameters.AddWithValue("@nombre", reserva.nombre);
+                cmd.Parameters.AddWithValue("@cliente_id", reserva.cliente_id);
+                cmd.Parameters.AddWithValue("@evento_id", reserva.evento_id);
+                cmd.Parameters.AddWithValue("@fecha", reserva.fecha);
+                cmd.Parameters.AddWithValue("@descripcion", reserva.descripcion);
                 cmd.ExecuteNonQuery();
                 return "ok";
             }
@@ -88,9 +92,14 @@
             try
             {
                 cmd.Connection = conexion.AbrirConexion();
-                cmd.CommandText = "update reservaciones set nombre='" + reserva.nombre + "' where reservacion_id=" + reserva.reservacion_id;
-                cmd.CommandText = "update reservaciones set fecha='" + reserva.fecha + "' where reservacion_id=" + reserva.reservacion_id;
-                cmd.CommandText = "update reservaciones set descripcion='" + reserva.descripcion + "' where reservacion_id=" + reserva.reservacion_id;
+                cmd.CommandText = "UPDATE reservaciones SET nombre = @nombre, cliente_id = @cliente_id, evento_id = @evento_id, fecha = @fecha, descripcion = @descripcion WHERE reservacion_id = @reservacion_id";
+                cmd.Parameters.Clear();
+                cmd.Parameters.AddWithValue("@nombre", reserva.nombre);
+                cmd.Parameters.AddWithValue("@cliente_id", reserva.cliente_id);
+                cmd.Parameters.AddWithValue("@evento_id", reserva.evento_id);
+                cmd.Parameters.AddWithValue("@fecha", reserva.fecha);
+                cmd.Parameters.AddWithValue("@descripcion", reserva.descripcion);
+                cmd.Parameters.AddWithValue("@reservacion_id", reserva.reservacion_id);
                 cmd.ExecuteNonQuery();
                 return "ok";
             }

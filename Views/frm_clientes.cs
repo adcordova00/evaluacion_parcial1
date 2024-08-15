@@ -2,11 +2,10 @@
 {
     using System;
     using System.Windows.Forms;
-    using System.Data.SqlClient;
-    using System.Data;
     using evaluacion_parcial1.Controllers;
     using evaluacion_parcial1.Models;
     using System.Collections.Generic;
+    using System.Linq;
 
     public partial class frm_clientes : Form
     {
@@ -17,11 +16,32 @@
             InitializeComponent();
         }
 
+        private bool ValidarCamposObligatorios(Control container)
+        {
+            foreach (Control control in container.Controls)
+            {
+                if (control is TextBox && string.IsNullOrWhiteSpace(control.Text))
+                {
+                    MessageBox.Show($"El campo {control.Name} es obligatorio.");
+                    return false;
+                }
+                else if (control is ComboBox && ((ComboBox)control).SelectedItem == null)
+                {
+                    MessageBox.Show($"Debes seleccionar un valor en {control.Name}.");
+                    return false;
+                }
+            }
+            return true;
+        }
+
         public void CargarClientes() {
-            lst_clientes.DataSource = null; // Limpia la fuente de datos anterior
-            lst_clientes.DataSource = clienteController.Clientes(); // Vincula la lista de clientes
-            lst_clientes.DisplayMember = "DisplayInfo"; // Usa una propiedad que formatees en el modelo
-            lst_clientes.ValueMember = "cliente_id";
+            lst_clientes.Items.Clear(); 
+            List<ClienteModel> clientes = clienteController.Clientes();
+
+            foreach (var cliente in clientes)
+            {
+                lst_clientes.Items.Add($"{cliente.cliente_id} - {cliente.nombre} {cliente.apellido} - {cliente.email} - {cliente.telefono}");
+            }
         }
 
         private void LimpiarForm() {
@@ -53,58 +73,128 @@
 
         private void btn_guardar_cliente_Click(object sender, EventArgs e)
         {
-            ClienteModel clienteModel = new ClienteModel
+            if (ValidarCamposObligatorios(this))
             {
-                nombre = txt_nombre_cliente.Text,
-                apellido = txt_apellido_cliente.Text,
-                email = txt_email_cliente.Text,
-                telefono = txt_telefono_cliente.Text
-            };
+                ClienteModel clienteModel = new ClienteModel
+                {
+                    nombre = txt_nombre_cliente.Text,
+                    apellido = txt_apellido_cliente.Text,
+                    email = txt_email_cliente.Text,
+                    telefono = txt_telefono_cliente.Text
+                };
 
-            string response = cliente_id == 0
-                ? clienteController.SaveCliente(clienteModel)
-                : clienteController.UpdateCliente(clienteModel);
+                string response = cliente_id == 0
+                    ? clienteController.SaveCliente(clienteModel)
+                    : clienteController.UpdateCliente(clienteModel);
 
-            if (response == "ok")
-            {
-                MessageBox.Show("Se guardó con éxito");
-                CargarClientes(); // Recargar la lista de clientes
+                if (response == "ok")
+                {
+                    MessageBox.Show("Se guardó con éxito");
+                    lst_clientes.Items.Clear();
+                    CargarClientes(); 
+                }
+                else
+                {
+                    MessageBox.Show("Ocurrió un error: " + response);
+                }
+
+                LimpiarForm();
             }
-            else
-            {
-                MessageBox.Show("Ocurrió un error: " + response);
-            }
-
-            LimpiarForm();
         }
 
         private void lst_clientes_SelectedIndexChanged(object sender, EventArgs e)
         {
-            if (lst_clientes.SelectedItem != null)
-            {
-                ClienteModel clienteSeleccionado = (ClienteModel)lst_clientes.SelectedItem;
-                cliente_id = clienteSeleccionado.cliente_id;
-            }
+           
         }
 
         private void btn_eliminar_cliente_Click(object sender, EventArgs e)
         {
-            ClienteModel clienteModel = new ClienteModel { cliente_id = cliente_id };
-            DialogResult result = MessageBox.Show("Desea Eliminar el cliente?", "Formulario de clientes", MessageBoxButtons.YesNo);
-            if (result == DialogResult.Yes)
+            if (lst_clientes.SelectedItem != null)
             {
-                if (clienteController.DeleteCliente(clienteModel) == "OK")
+                
+                string selectedText = lst_clientes.SelectedItem.ToString();
+                int cliente_id = Convert.ToInt32(selectedText.Split('-')[0].Trim());
+                DialogResult result = MessageBox.Show("Desea Eliminar el cliente?", "Formulario de clientes", MessageBoxButtons.YesNo);
+                if (result == DialogResult.Yes)
                 {
-                    MessageBox.Show("Se elimino con exito");
+                    ClienteModel clienteModel = new ClienteModel { cliente_id = cliente_id };
+                    string deleteResponse = clienteController.DeleteCliente(clienteModel);
+
+                    if (deleteResponse == "ok")
+                    {
+                        MessageBox.Show("Se eliminó con éxito");
+                        CargarClientes(); 
+                    }
+                    else
+                    {
+                        MessageBox.Show("Ocurrió un error al eliminar: " + deleteResponse);
+                    }
                 }
                 else
                 {
-                    MessageBox.Show("Ocurrio un error al eliminar");
+                    MessageBox.Show("El usuario canceló la operación");
                 }
             }
             else
             {
-                MessageBox.Show("El usuario cancelo la operacion");
+                MessageBox.Show("Por favor, seleccione un cliente para eliminar.");
+            }
+        }
+
+        private void btn_editar_cliente_Click(object sender, EventArgs e)
+        {
+            if (ValidarCamposObligatorios(this))
+            {
+                ClienteModel clienteModel = new ClienteModel
+                {
+                    cliente_id = this.cliente_id, 
+                    nombre = txt_nombre_cliente.Text,
+                    apellido = txt_apellido_cliente.Text,
+                    email = txt_email_cliente.Text,
+                    telefono = txt_telefono_cliente.Text
+                };
+
+                string response = clienteController.UpdateCliente(clienteModel);
+
+                if (response == "ok")
+                {
+                    MessageBox.Show("Cliente actualizado con éxito.");
+                    CargarClientes(); 
+                    LimpiarForm();  
+                }
+                else
+                {
+                    MessageBox.Show("Ocurrió un error al actualizar el cliente: " + response);
+                }
+            }
+        }
+
+        private void lst_clientes_DoubleClick(object sender, EventArgs e)
+        {
+            if (lst_clientes.SelectedItem != null)
+            {
+                
+                string selectedText = lst_clientes.SelectedItem.ToString();
+                int cliente_id = Convert.ToInt32(selectedText.Split('-')[0].Trim());
+
+                ClienteModel clienteSeleccionado = clienteController.Clientes().FirstOrDefault(c => c.cliente_id == cliente_id);
+
+                if (clienteSeleccionado != null)
+                {
+                    txt_nombre_cliente.Text = clienteSeleccionado.nombre;
+                    txt_apellido_cliente.Text = clienteSeleccionado.apellido;
+                    txt_email_cliente.Text = clienteSeleccionado.email;
+                    txt_telefono_cliente.Text = clienteSeleccionado.telefono;
+                    this.cliente_id = clienteSeleccionado.cliente_id;
+                }
+                else
+                {
+                    MessageBox.Show("No se pudo encontrar el cliente seleccionado.");
+                }
+            }
+            else
+            {
+                MessageBox.Show("Por favor, seleccione un cliente para editar.");
             }
         }
     }

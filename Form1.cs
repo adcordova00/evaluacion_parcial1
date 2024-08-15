@@ -27,5 +27,10 @@
         {
             frm_Reservaciones.ShowDialog(this);
         }
+
+        private void Form1_Load(object sender, EventArgs e)
+        {
+            MessageBox.Show("INSTRUCCIONES PARA EDITAR CUALQUIER ELEMENTO: DAR DOBLE CLICK EN EL ELEMENTO - MODIFICAR LOS DATOS - GUARDAR CON EL BOTON EDITAR");
+        }
     }
 }
